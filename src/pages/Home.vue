@@ -4,25 +4,12 @@
       <header-block />
       <div class="body-wrapper">
       </div>
+
     </div>
     <div class="join-wrapper" v-show="!isJoined">
-      <div class="inputs-wrapper">
-        <div class="input-wrapper">
-          <span class="input-label">Username</span>
-          <input class="input" type="text" :placeholder="userNamePlaceholder" v-model="userName"
-                 v-on:focus="userNamePlaceholder = ''"
-                 v-on:focusout="userNamePlaceholder = initPlaceholder('username')">
-        </div>
-
-        <div class="input-wrapper">
-          <span class="input-label">Room</span>
-          <input class="input" type="text" :placeholder="roomNamePlaceholder" v-model="roomName"
-                 v-on:focus="roomNamePlaceholder = ''"
-                 v-on:focusout="roomNamePlaceholder = initPlaceholder('room')">
-        </div>
-      </div>
-      <filled-button button-title="Join" :is-available="isButtonAvailable" button-type="signin"
-                     :method="click" />
+      <input-component input-label="Username" :show-label="true" @inputChangedEvent="changeValues" />
+      <input-component input-label="Room" :show-label="true" @inputChangedEvent="changeValues" />
+      <filled-button button-label="Join" :is-available="isButtonAvailable" button-type="signin" :method="click" />
     </div>
   </div>
 </template>
@@ -31,21 +18,21 @@
 const io = require("socket.io-client")
 import { uuid } from "vue-uuid"
 
+
+import InputComponent from "@/components/InputComponent";
 import FilledButton from "@/components/buttons/FilledButton";
 import HeaderBlock from "@/components/HeaderBlock";
 export default {
   name: "Home",
 
-  components: {HeaderBlock, FilledButton},
+  components: {InputComponent, HeaderBlock, FilledButton},
 
   data () {
     return {
       isJoined: false,
       socket: io("localhost:1488"),
       userName: "",
-      userNamePlaceholder: this.initPlaceholder("username"),
       roomName: "",
-      roomNamePlaceholder: this.initPlaceholder("room")
     }
   },
 
@@ -67,13 +54,20 @@ export default {
     click () {
       if (!this.isButtonAvailable) return
 
-       this.socket.emit('connect_user', this.user)
+      this.socket.emit('connect_user', this.user)
 
       this.isJoined = true
     },
-    initPlaceholder (label) {
-      return "Type " + label.toLowerCase() + " here"
-    },
+
+    changeValues(data) {
+
+      if (data.target.toLowerCase() === "username") {
+        this.userName = data.value
+      }
+      else if (data.target.toLowerCase() === "room") {
+        this.roomName = data.value
+      }
+    }
   },
 
   mounted() {
@@ -131,55 +125,6 @@ export default {
     position: fixed;
     background: white;
     padding: 30px 20px;
-  }
-
-  .input-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    box-sizing: border-box;
-    margin-bottom: 16px;
-  }
-
-  .input-label {
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  .input {
-    outline: none;
-    width: 200px;
-    font-size: 13px;
-    margin-top: 4px;
-    padding: 5px 10px;
-    border-radius: 4px;
-    box-sizing: border-box;
-    border: 2px solid #e6e6e6;
-    background: #e6e6e6;
-  }
-
-  .input:focus {
-    border: 2px solid #48d294;
-  }
-
-  .empty-field {
-    display: flex;
-    align-items: center;
-    width: 100%;
-
-    padding: 5px 10px;
-    background: #e6e6e6;
-    border: 1px solid #e91917;
-    border-left: 3px solid #e91917;
-    border-radius: 5px;
-    box-sizing: border-box;
-    margin-bottom: 16px;
-  }
-
-  .empty-field-text-wrapper {
-    font-size: 12px;
-    font-weight: 700;
-    margin-left: 8px;
   }
 
 </style>
