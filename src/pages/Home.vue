@@ -4,17 +4,8 @@
       <header-block />
       <div class="body-wrapper">
       </div>
-
     </div>
     <div class="join-wrapper" v-show="!isJoined">
-      <div class="empty-field" v-show="emptyUsername || emptyRoom">
-        <image-component :image-path="require('../assets/image/block.svg')" image-alt="block" image-size="16px" />
-        <div class="empty-field-text-wrapper">
-          <span v-if="emptyUsername">Username</span>
-          <span v-else-if="emptyRoom">Room</span>
-          <span> field missed</span>
-        </div>
-      </div>
       <div class="inputs-wrapper">
         <div class="input-wrapper">
           <span class="input-label">Username</span>
@@ -30,13 +21,13 @@
                  v-on:focusout="roomNamePlaceholder = initPlaceholder('room')">
         </div>
       </div>
-      <filled-button button-title="Join" :method="click" />
+      <filled-button button-title="Join" :is-available="isButtonAvailable" button-type="signin"
+                     :method="click" />
     </div>
   </div>
 </template>
 
 <script>
-import ImageComponent from "@/components/ImageComponent";
 const io = require("socket.io-client")
 import { uuid } from "vue-uuid"
 
@@ -45,7 +36,7 @@ import HeaderBlock from "@/components/HeaderBlock";
 export default {
   name: "Home",
 
-  components: {ImageComponent, HeaderBlock, FilledButton},
+  components: {HeaderBlock, FilledButton},
 
   data () {
     return {
@@ -54,33 +45,16 @@ export default {
       userName: "",
       userNamePlaceholder: this.initPlaceholder("username"),
       roomName: "",
-      roomNamePlaceholder: this.initPlaceholder("room"),
-      emptyUsername: null,
-      emptyRoom: null
+      roomNamePlaceholder: this.initPlaceholder("room")
     }
   },
 
-  methods: {
-    click () {
-
-      !this.userName ? this.emptyUsername = true : ""
-      !this.roomName ? this.emptyRoom = true : ""
-
-      if (!this.userName) {
-        this.emptyUsername = true
-      }
-      else if (!this.roomName) {
-        this.emptyRoom = true
-      }
-
-      let user = this.initUser()
-
-      this.socket.emit('connect_user', user)
+  computed: {
+    isButtonAvailable () {
+      return this.roomName && this.userName
     },
-    initPlaceholder (label) {
-      return "Type " + label.toLowerCase() + " here"
-    },
-    initUser () {
+
+    user () {
       return {
         uid: uuid.v1(),
         username: this.userName,
@@ -89,23 +63,25 @@ export default {
     }
   },
 
+  methods: {
+    click () {
+      if (!this.isButtonAvailable) return
+
+       this.socket.emit('connect_user', this.user)
+
+      this.isJoined = true
+    },
+    initPlaceholder (label) {
+      return "Type " + label.toLowerCase() + " here"
+    },
+  },
+
   mounted() {
     this.socket.on('user_connected', (user) => {
       user = {}
       user.toString()
     })
   },
-
-  watch: {
-    userName (val) {
-      this.userName = val
-      this.userName ? this.emptyUsername = false : ""
-    },
-    roomName (val) {
-      this.roomName = val
-      this.roomName ? this.emptyRoom = false : ""
-    }
-  }
 }
 </script>
 
