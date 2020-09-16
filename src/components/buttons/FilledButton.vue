@@ -1,7 +1,7 @@
 <template>
   <button class="filled-button" v-on:click="method" v-bind:class="{'unavailable-signin': (buttonType === 'signin' && !isAvailable),
   'available-signin': (buttonType === 'signin' && isAvailable)}">
-    <span> {{ buttonTitle }} </span>
+    <span> {{ buttonLabel }} </span>
   </button>
 </template>
 
@@ -11,7 +11,7 @@ export default {
   name: "FilledButton",
 
   props: {
-    buttonTitle: {
+    buttonLabel: {
       required: true
     },
     buttonType: {
