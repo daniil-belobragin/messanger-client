@@ -1,63 +1,53 @@
 <template>
-  <button class="filled-button" v-on:click="method">
+  <button class="filled-button" v-on:click="method" v-bind:class="{'unavailable-signin': (buttonType === 'signin' && !isAvailable),
+  'available-signin': (buttonType === 'signin' && isAvailable)}">
     <span> {{ buttonTitle }} </span>
   </button>
 </template>
 
 <script>
-const io = require('socket.io-client');
-
 export default {
 
   name: "FilledButton",
-
-  data () {
-    return {
-      socket: io("http://localhost:1488"),
-      user: {
-        username: "Daniil",
-        photo: null,
-      }
-    }
-  },
 
   props: {
     buttonTitle: {
       required: true
     },
+    buttonType: {
+      type: String
+    },
+    isAvailable: {
+      default: false
+    },
     method: {
+      required: true
     }
   },
-
-  methods: {
-    socketConnect () {
-    }
-  },
-
-  mounted() {
-    this.socket.on('customEmit', (msg) => {
-      console.log('custom')
-      console.log(msg)
-    })
-
-    this.socket.emit('connected_user', this.user)
-  }
 }
 </script>
 
-<style scoped>
+<style lang="scss">
   .filled-button {
     border: none;
-    background: #48d294;
     color: black;
     outline: none;
     padding: 5px;
     width: 100%;
     border-radius: 5px;
+  }
+
+
+  .unavailable-signin {
+    background: #e6e6e6;
+  }
+
+  .available-signin {
+    background: #48d294;
     cursor: pointer;
   }
 
-  .filled-button:hover {
+  .available-signin:hover {
     filter: brightness(95%);
   }
 </style>
