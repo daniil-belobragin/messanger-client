@@ -1,5 +1,6 @@
 <template>
-  <div class="image-wrapper" v-bind:class="{image16: imageSize === '16px'}">
+  <div class="image-wrapper" v-bind:class="{image16: imageSize === '16px'}"
+       v-on:click="clickFunc">
     <img class="image" :src="imagePath" :alt="imageAlt" />
   </div>
 </template>
@@ -12,11 +13,18 @@ export default {
     imagePath: {
       required: true
     },
+
     imageAlt: {
       required: true
     },
+
     imageSize: {
       default: ""
+    },
+
+    clickFunc: {
+      type: Function,
+      default: () => {}
     }
   }
 }

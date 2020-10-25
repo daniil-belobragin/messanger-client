@@ -1,8 +1,8 @@
 <template>
   <div class="header-wrapper">
-    <router-link :to="'/'" class="link" :disabled="false" >
+    <router-link :to="'/'" class="link" tag="button" :disabled="!isJoined" >
       <text-button :with-image="true" :image-path="require('../assets/image/logo.svg')"
-                 image-alt="logo" button-label="Chat App" />
+                 image-alt="logo" button-label="Chat App" :click="clickFunc"/>
     </router-link>
   </div>
 </template>
@@ -11,7 +11,21 @@
 import TextButton from "@/components/buttons/TextButton";
 export default {
   name: "HeaderBlock",
-  components: {TextButton}
+
+  components: {
+    TextButton
+  },
+
+  props: {
+    isJoined: {
+      default: false
+    },
+
+    clickFunc: {
+      type: Function,
+      default: () => {}
+    }
+  }
 }
 </script>
 

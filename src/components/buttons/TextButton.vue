@@ -1,5 +1,5 @@
 <template>
-  <button class="button-wrapper">
+  <button class="button-wrapper" v-on:click="click">
     <image-component v-show="withImage" :image-path="imagePath" :image-alt="imageAlt" />
     <span class="label"> {{ buttonLabel }} </span>
   </button>
@@ -9,17 +9,28 @@
 import ImageComponent from "@/components/ImageComponent";
 export default {
   name: "TextButton",
-  components: {ImageComponent},
+
+  components: {
+    ImageComponent
+  },
+
   props: {
     buttonLabel: {
       required: true
     },
+
     withImage: {
       default: false
     },
+
     imageAlt: {
+      type: String
     },
-    imagePath: {
+
+    imagePath: {},
+
+    click: {
+      type: Function
     }
   }
 }
@@ -35,6 +46,7 @@ export default {
     background: none;
     outline: none;
     cursor: pointer;
+    padding: 0;
   }
 
   .label {

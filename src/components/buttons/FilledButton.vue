@@ -1,6 +1,6 @@
 <template>
-  <button class="filled-button" v-on:click="method" v-bind:class="{'unavailable-signin': (buttonType === 'signin' && !isAvailable),
-  'available-signin': (buttonType === 'signin' && isAvailable)}">
+  <button class="filled-button" v-on:click="method" v-bind:class="{'signin': buttonType === 'signin',
+  'disabled': !isAvailable}" :disabled="!isAvailable">
     <span> {{ buttonLabel }} </span>
   </button>
 </template>
@@ -37,17 +37,20 @@ export default {
     border-radius: 5px;
   }
 
-
-  .unavailable-signin {
-    background: #e6e6e6;
-  }
-
-  .available-signin {
+  .signin {
     background: #48d294;
     cursor: pointer;
   }
 
-  .available-signin:hover {
+  .signin:hover {
     filter: brightness(95%);
+  }
+
+  .disabled {
+    background: #fefefe;
+    cursor: default;
+  }
+  .disabled:hover {
+    filter: none;
   }
 </style>

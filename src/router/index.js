@@ -3,6 +3,7 @@ import Router from 'vue-router'
 
 import Home from "../pages/Home";
 import Test from "../pages/Test";
+import Room from "@/pages/Room";
 
 Vue.use(Router)
 
@@ -22,6 +23,11 @@ export default new Router({
             name: "test",
             path: "/test",
             component: Test
+        },
+        {
+            name: "room",
+            path: "/rooms/:rid",
+            component: Room
         }
     ]
 })
