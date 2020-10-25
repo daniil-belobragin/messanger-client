@@ -1,209 +1,149 @@
 <template>
   <div class="page-wrapper">
     <div class="wrapper" v-bind:class="{blur: !isJoined}">
-      <header-block />
+      <header-block :is-joined="isJoined" />
       <div class="body-wrapper">
       </div>
-
     </div>
+    <span class="api-error" v-show="showError"> {{ errorMessage }} </span>
     <div class="join-wrapper" v-show="!isJoined">
-      <div class="empty-field" v-show="emptyUsername || emptyRoom">
-        <image-component :image-path="require('../assets/image/block.svg')" image-alt="block" image-size="16px" />
-        <div class="empty-field-text-wrapper">
-          <span v-if="emptyUsername">Username</span>
-          <span v-else-if="emptyRoom">Room</span>
-          <span> field missed</span>
-        </div>
-      </div>
-      <div class="inputs-wrapper">
-        <div class="input-wrapper">
-          <span class="input-label">Username</span>
-          <input class="input" type="text" :placeholder="userNamePlaceholder" v-model="userName"
-                 v-on:focus="userNamePlaceholder = ''"
-                 v-on:focusout="userNamePlaceholder = initPlaceholder('username')">
-        </div>
-
-        <div class="input-wrapper">
-          <span class="input-label">Room</span>
-          <input class="input" type="text" :placeholder="roomNamePlaceholder" v-model="roomName"
-                 v-on:focus="roomNamePlaceholder = ''"
-                 v-on:focusout="roomNamePlaceholder = initPlaceholder('room')">
-        </div>
-      </div>
-      <filled-button button-title="Join" :method="click" />
+      <input-component input-label="Username" :show-label="true" :input-changed="changeUserName" />
+      <input-component input-label="Room" :show-label="true" :input-changed="changeRoomName" />
+      <input-component input-label="Icon color" error-label="Value must be hex" :invalid="$v.$invalid"
+                       :show-label="true" :input-changed="changeIconColor" />
+      <filled-button button-label="Join" :is-available="isButtonAvailable" button-type="signin" :method="click" />
     </div>
   </div>
 </template>
 
 <script>
-import ImageComponent from "@/components/ImageComponent";
-const io = require("socket.io-client")
-import { uuid } from "vue-uuid"
+import {createUser} from "@/api/user";
+import {createRoom} from "@/api/room";
 
-import FilledButton from "@/components/buttons/FilledButton";
-import HeaderBlock from "@/components/HeaderBlock";
+import {validationMixin} from "vuelidate"
+import {helpers} from "vuelidate/lib/validators"
+
+const hexValidator = helpers.regex('hexValidator', /^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
+
+import InputComponent from "../components/InputComponent";
+import FilledButton from "../components/buttons/FilledButton";
+import HeaderBlock from "../components/HeaderBlock";
+import {User} from "@/util/user";
+
 export default {
   name: "Home",
 
-  components: {ImageComponent, HeaderBlock, FilledButton},
+  components: {
+    InputComponent,
+    HeaderBlock,
+    FilledButton
+  },
+
+  mixins: [validationMixin],
 
   data () {
     return {
-      isJoined: false,
-      socket: io("localhost:1488"),
-      userName: "",
-      userNamePlaceholder: this.initPlaceholder("username"),
       roomName: "",
-      roomNamePlaceholder: this.initPlaceholder("room"),
-      emptyUsername: null,
-      emptyRoom: null
+      userName: "",
+      iconColor: "0b2239",
+      showError: false,
+      errorMessage: "Unexpected error occurred"
+    }
+  },
+
+  computed: {
+    isButtonAvailable () {
+      return this.roomName && this.userName && !this.$v.$invalid
+    },
+
+    isJoined () {
+      return this.$store.state.isJoined
+    },
+
+    currentUser () {
+      return this.$store.state.user
     }
   },
 
   methods: {
     click () {
-
-      !this.userName ? this.emptyUsername = true : ""
-      !this.roomName ? this.emptyRoom = true : ""
-
-      if (!this.userName) {
-        this.emptyUsername = true
-      }
-      else if (!this.roomName) {
-        this.emptyRoom = true
-      }
-
-      let user = this.initUser()
-
-      this.socket.emit('connect_user', user)
+      createUser(this.userName, this.iconColor, (response) => {
+        this.$store.commit("storeUser",
+            new User(response.data.id, this.userName, this.iconColor))
+        this.userCreated()
+      }, (error) => {
+        this.handleError(error)
+        this.showError = true
+      })
     },
-    initPlaceholder (label) {
-      return "Type " + label.toLowerCase() + " here"
+
+    userCreated() {
+      createRoom(this.roomName, this.currentUser.id, () => {
+        this.redirectToRoom()
+      }, (error) => {
+        if (error.code === 409) {
+          this.redirectToRoom()
+        }
+      })
     },
-    initUser () {
-      return {
-        uid: uuid.v1(),
-        username: this.userName,
-        room: this.roomName
+
+    redirectToRoom() {
+      this.$store.commit("setIsJoined", true)
+      this.$router.push({
+        name: "room",
+        params: {
+          rid: this.roomName
+        }
+      })
+    },
+
+    handleError(error) {
+      switch (true) {
+        case error.code === 404 || error.code === 409:
+          this.errorMessage = error.data.pointer.charAt(0).toUpperCase() +
+              error.data.pointer.slice(1) + " " + error.data.message
+          break
+        case !error.executed:
+          this.errorMessage = "Service unavailable"
+          break
       }
+    },
+
+    changeUserName(value) {
+      this.userName = value
+      this.showError = false
+    },
+
+    changeRoomName(value) {
+      this.roomName = value
+      this.showError = false
+    },
+
+    changeIconColor(value) {
+      this.iconColor = value
+      this.showError = false
+      this.$v.$touch()
     }
   },
 
-  mounted() {
-    this.socket.on('user_connected', (user) => {
-      user = {}
-      user.toString()
-    })
-  },
-
-  watch: {
-    userName (val) {
-      this.userName = val
-      this.userName ? this.emptyUsername = false : ""
-    },
-    roomName (val) {
-      this.roomName = val
-      this.roomName ? this.emptyRoom = false : ""
+  validations: {
+    iconColor: {
+      hexValidator
     }
   }
 }
 </script>
 
 <style lang="scss">
+  @import "../assets/style/style";
 
-  .page-wrapper {
+  .api-error {
     width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-  }
-
-  .wrapper {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-  }
-
-  .blur {
-    filter: blur(4px);
-  }
-
-  .body-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    padding: 0 30px;
-    box-sizing: border-box;
-    flex: 1;
-  }
-
-  .join-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #666666;
-    border-radius: 6px;
+    text-align: center;
+    font-size: 22px;
+    color: crimson;
     position: fixed;
-    background: white;
-    padding: 30px 20px;
-  }
-
-  .input-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    box-sizing: border-box;
-    margin-bottom: 16px;
-  }
-
-  .input-label {
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  .input {
-    outline: none;
-    width: 200px;
-    font-size: 13px;
-    margin-top: 4px;
-    padding: 5px 10px;
-    border-radius: 4px;
-    box-sizing: border-box;
-    border: 2px solid #e6e6e6;
-    background: #e6e6e6;
-  }
-
-  .input:focus {
-    border: 2px solid #48d294;
-  }
-
-  .empty-field {
-    display: flex;
-    align-items: center;
-    width: 100%;
-
-    padding: 5px 10px;
-    background: #e6e6e6;
-    border: 1px solid #e91917;
-    border-left: 3px solid #e91917;
-    border-radius: 5px;
-    box-sizing: border-box;
-    margin-bottom: 16px;
-  }
-
-  .empty-field-text-wrapper {
-    font-size: 12px;
-    font-weight: 700;
-    margin-left: 8px;
+    top: 100px
   }
 
 </style>

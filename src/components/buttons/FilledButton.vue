@@ -1,63 +1,56 @@
 <template>
-  <button class="filled-button" v-on:click="method">
-    <span> {{ buttonTitle }} </span>
+  <button class="filled-button" v-on:click="method" v-bind:class="{'signin': buttonType === 'signin',
+  'disabled': !isAvailable}" :disabled="!isAvailable">
+    <span> {{ buttonLabel }} </span>
   </button>
 </template>
 
 <script>
-const io = require('socket.io-client');
-
 export default {
 
   name: "FilledButton",
 
-  data () {
-    return {
-      socket: io("http://localhost:1488"),
-      user: {
-        username: "Daniil",
-        photo: null,
-      }
-    }
-  },
-
   props: {
-    buttonTitle: {
+    buttonLabel: {
       required: true
     },
+    buttonType: {
+      type: String
+    },
+    isAvailable: {
+      default: false
+    },
     method: {
+      required: true
     }
   },
-
-  methods: {
-    socketConnect () {
-    }
-  },
-
-  mounted() {
-    this.socket.on('customEmit', (msg) => {
-      console.log('custom')
-      console.log(msg)
-    })
-
-    this.socket.emit('connected_user', this.user)
-  }
 }
 </script>
 
-<style scoped>
+<style lang="scss">
   .filled-button {
     border: none;
-    background: #48d294;
     color: black;
     outline: none;
     padding: 5px;
     width: 100%;
     border-radius: 5px;
+  }
+
+  .signin {
+    background: #48d294;
     cursor: pointer;
   }
 
-  .filled-button:hover {
+  .signin:hover {
     filter: brightness(95%);
+  }
+
+  .disabled {
+    background: #fefefe;
+    cursor: default;
+  }
+  .disabled:hover {
+    filter: none;
   }
 </style>

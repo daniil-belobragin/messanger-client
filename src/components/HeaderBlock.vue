@@ -1,21 +1,37 @@
 <template>
   <div class="header-wrapper">
-    <div class="title-wrapper">
-      <image-component :image-path="require('../assets/image/logo.svg')" image-alt="logo" />
-      <span class="app-title">Chat App</span>
-    </div>
+    <router-link :to="'/'" class="link" tag="button" :disabled="!isJoined" >
+      <text-button :with-image="true" :image-path="require('../assets/image/logo.svg')"
+                 image-alt="logo" button-label="Chat App" :click="clickFunc"/>
+    </router-link>
   </div>
 </template>
 
 <script>
-import ImageComponent from "@/components/ImageComponent";
+import TextButton from "@/components/buttons/TextButton";
 export default {
   name: "HeaderBlock",
-  components: {ImageComponent}
+
+  components: {
+    TextButton
+  },
+
+  props: {
+    isJoined: {
+      default: false
+    },
+
+    clickFunc: {
+      type: Function,
+      default: () => {}
+    }
+  }
 }
 </script>
 
-<style scoped>
+<style lang="scss">
+  @import "../assets/style/style.scss";
+
   .header-wrapper {
     width: 100%;
     background: #0b2239;
@@ -23,15 +39,4 @@ export default {
     box-sizing: border-box;
   }
 
-  .title-wrapper {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .app-title {
-    color: white;
-    font-weight: 700;
-    margin-left: 12px;
-  }
 </style>
