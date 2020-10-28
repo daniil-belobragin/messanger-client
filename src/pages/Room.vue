@@ -308,4 +308,28 @@ export default {
     align-items: center;
   }
 
+  @media (min-device-width: 280px) and (max-device-width: 425px) {
+    .body-wrapper {
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .online-users-wrapper {
+      flex-direction: row;
+      overflow-y: scroll;
+      width: 100%;
+      height: 20%;
+    }
+
+    .chat-wrapper {
+      width: 100%;
+      height: 75%;
+    }
+
+    .user-wrapper {
+      margin-top: 0;
+      margin-left: 10px;
+    }
+  }
+
 </style>
