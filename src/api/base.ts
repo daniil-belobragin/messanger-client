@@ -1,16 +1,16 @@
-const API_DEFAULT_PROTOCOL = 'https://'
-const API_HOST = 'api.daniil-belobragin.work'
+const API_DEFAULT_PROTOCOL: string = 'http://'
+const API_HOST: string = 'localhost:2020'
 
-const SOCKETS_DEFAULT_PROTOCOL = 'https://'
-const SOCKETS_HOST = 'api.daniil-belobragin.work'
+const SOCKETS_DEFAULT_PROTOCOL = 'http://'
+const SOCKETS_HOST = 'localhost:2020'
 
-const API_DEFAULT_URL = API_DEFAULT_PROTOCOL + API_HOST
-const SOCKETS_DEFAULT_URL = SOCKETS_DEFAULT_PROTOCOL + SOCKETS_HOST
+const API_DEFAULT_URL: string = API_DEFAULT_PROTOCOL + API_HOST
+const SOCKETS_DEFAULT_URL: string = SOCKETS_DEFAULT_PROTOCOL + SOCKETS_HOST
 
 class ApiResponse {
-    data
-    code
-    executed
+    data: string
+    code: number
+    executed: boolean
 
     constructor() {
         this.data = null
@@ -45,8 +45,9 @@ class ApiHelper {
     }
 }
 
+
 export {
-    API_DEFAULT_URL,
     SOCKETS_DEFAULT_URL,
+    API_DEFAULT_URL,
     ApiHelper
 }
