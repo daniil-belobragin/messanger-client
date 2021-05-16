@@ -8,13 +8,13 @@ const API_DEFAULT_URL: string = API_DEFAULT_PROTOCOL + API_HOST
 const SOCKETS_DEFAULT_URL: string = SOCKETS_DEFAULT_PROTOCOL + SOCKETS_HOST
 
 class ApiResponse {
-    data: string
+    data: any
     code: number
     executed: boolean
 
     constructor() {
         this.data = null
-        this.code = null
+        this.code = NaN
         this.executed = true
     }
 }
@@ -22,7 +22,7 @@ class ApiResponse {
 
 class ApiHelper {
 
-    static handleResponse(response, callback) {
+    static handleResponse(response: any, callback: any) {
         let mResponse = new ApiResponse()
         mResponse.data = response.data
         mResponse.code = response.status
@@ -30,7 +30,7 @@ class ApiHelper {
         callback(mResponse)
     }
 
-    static handleErrorResponse(error, errorCallback) {
+    static handleErrorResponse(error: any, errorCallback: any) {
         let mResponse = new ApiResponse()
 
         if (!error.response) {
@@ -38,7 +38,7 @@ class ApiHelper {
             errorCallback(mResponse)
             return
         }
-        mResponse.data = error.response.data.error
+        mResponse.data = error.response.data
         mResponse.code = error.response.status
 
         errorCallback(mResponse)

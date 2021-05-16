@@ -5,14 +5,10 @@
 </template>
 
 <script lang="ts">
-export default {
-  name: 'App',
-}
+import { Vue } from 'vue-property-decorator';
+export default class App extends Vue {}
 </script>
 
 <style lang="scss">
-  @import "./assets/style/style";
-  #app {
-    width: 100%;
-  }
+@import "src/assets/style/style";
 </style>

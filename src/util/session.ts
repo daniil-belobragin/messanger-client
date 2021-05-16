@@ -16,7 +16,7 @@ class SessionManager {
     }
 
     static isLoggedIn (): boolean  {
-        return JSON.parse(localStorage.getItem("authorized"))
+        return JSON.parse(<string>localStorage.getItem("authorized"))
     }
 
     static logOut () {
@@ -36,7 +36,7 @@ class SessionManager {
 
     static getSession (): Session {
         let session = localStorage.getItem("session")
-        return JSON.parse(session)
+        return JSON.parse(<string>session)
     }
 }
 

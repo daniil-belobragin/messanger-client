@@ -5,7 +5,7 @@ import {
 } from "./base";
 
 
-function createRoom(roomName, userId, callback, errorCallback) {
+function createRoom(roomName: string, userId: string, callback: any, errorCallback: any) {
     let body = {
         name: roomName,
         creator: userId
@@ -19,7 +19,7 @@ function createRoom(roomName, userId, callback, errorCallback) {
 }
 
 
-function deleteRoom(roomName, callback, errorCallback) {
+function deleteRoom(roomName: string, callback: any, errorCallback: any) {
     axios.delete(API_DEFAULT_URL + '/rooms/' + roomName).then((response) => {
         ApiHelper.handleResponse(response, callback)
     }).catch((error) => {

@@ -2,7 +2,8 @@ import {ApiHelper} from "./base";
 import {axiosInstance} from "./api";
 
 
-function signUp(userName: string, email: string, password: string, repeatPassword: string, callback, errorCallback) {
+function signUp(userName: string, email: string, password: string, repeatPassword: string, callback: any,
+                errorCallback: any) {
     let body = {
         name: userName,
         email: email,
@@ -17,7 +18,7 @@ function signUp(userName: string, email: string, password: string, repeatPasswor
     })
 }
 
-function signIn(email: string, password: string, callback, errorCallback) {
+function signIn(email: string, password: string, callback: any, errorCallback: any) {
     let body = {
         email: email,
         password: password
@@ -30,7 +31,7 @@ function signIn(email: string, password: string, callback, errorCallback) {
     })
 }
 
-function refresh(refresh_token: string, callback, errorCallback) {
+function refresh(refresh_token: string, callback: any, errorCallback: any) {
 
     let headers = {
         Authorization: refresh_token

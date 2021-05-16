@@ -5,7 +5,7 @@ import {
 } from "./base"
 
 
-function changeUserName (userName: string, access_token: string, callback, errorCallback) {
+function changeUserName (userName: string, access_token: string, callback: any, errorCallback: any) {
     let body = {
         name: userName
     }

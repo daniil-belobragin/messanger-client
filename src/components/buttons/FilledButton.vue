@@ -1,56 +1,36 @@
 <template>
-  <button class="filled-button" v-on:click="method" v-bind:class="{'signin': buttonType === 'signin',
-  'disabled': !isAvailable}" :disabled="!isAvailable">
+  <button class="filled-button" @click="method">
     <span> {{ buttonLabel }} </span>
   </button>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { Component, Vue, Prop } from "vue-property-decorator"
 
-  name: "FilledButton",
+@Component
+export default class FilledButton extends Vue {
 
-  props: {
-    buttonLabel: {
-      required: true
-    },
-    buttonType: {
-      type: String
-    },
-    isAvailable: {
-      default: false
-    },
-    method: {
-      required: true
-    }
-  },
+  @Prop({required: true}) buttonLabel!: string
+  @Prop({required: true}) method!: Function
+
 }
 </script>
 
 <style lang="scss">
   .filled-button {
+    margin-top: 30px;
+    font-size: 16px;
     border: none;
-    color: black;
+    color: white;
+    background: #356ba7;
     outline: none;
-    padding: 5px;
+    padding: 10px;
     width: 100%;
     border-radius: 5px;
-  }
-
-  .signin {
-    background: #48d294;
     cursor: pointer;
   }
 
-  .signin:hover {
-    filter: brightness(95%);
-  }
-
-  .disabled {
-    background: #fefefe;
-    cursor: default;
-  }
-  .disabled:hover {
-    filter: none;
+  .filled-button:hover {
+    filter: brightness(110%);
   }
 </style>

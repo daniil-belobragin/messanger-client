@@ -1,74 +1,34 @@
 <template>
-  <div class="input-wrapper" :class="{messageInputWrapper: inputType === 'message'}">
-    <span class="error" v-show="invalid">
-      {{ errorLabel }}
-    </span>
-    <span class="input-label" v-show="showLabel"> {{ inputLabel }} </span>
-    <image-component class="send-icon" v-if="inputType === 'message'" v-show="model"
-                     image-alt="send-icon" :image-path="require('../assets/image/send.svg')"
-                     image-size="16px" :click-func="sendMessage" />
-    <input class="input" :class="{messageInput: inputType === 'message'}" type="text" v-model="model"
-           :placeholder="placeholder" v-on:focus="placeholder=''" v-on:focusout="setPlaceholder">
+  <div class="input-wrapper" :class="{messageInputWrapper: isMessage}">
+    <span class="input-label" :v-show="!isMessage"> {{ inputLabel }} </span>
+    <input ref="inputs" class="input" :class="{messageInput: isMessage}" :type="inputType" v-model="model">
   </div>
 </template>
 
-<script>
-import ImageComponent from "@/components/ImageComponent";
-export default {
-  name: "InputComponent",
-  components: {
-    ImageComponent
-  },
-  data () {
-    return {
-      model: "",
-      placeholder: ""
-    }
-  },
+<script lang="ts">
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 
-  props: {
-    inputLabel: {
-      type: String
-    },
+@Component
+export default class InputComponent extends Vue {
 
-    showLabel: {
-      default: false
-    },
+  private model: string = ""
 
-    inputChanged: {
-      type: Function
-    },
+  @Prop() inputLabel!: string
+  @Prop({default: false}) isMessage!: boolean
+  @Prop({type: Function}) inputChanged!: Function
+  @Prop({default: "text"}) inputType!: string
+  @Prop({type: Function}) clearFunction!: Function
 
-    errorLabel: {},
 
-    invalid: {
-      default: false
-    },
 
-    inputType: {
-      default: "text"
-    },
+  @Watch("model")
+  modelChanged(newValue: string) {
+    this.inputChanged(newValue)
+  }
 
-    sendMessage: {
-      type: Function,
-      default: () => {}
-    }
-  },
-
-  methods: {
-    setPlaceholder () {
-      this.placeholder = "Type " + this.inputLabel.toLowerCase() + " here"
-    }
-  },
-
-  watch: {
-    model (newValue) {
-      this.inputChanged(newValue)
-    }
-  },
-
-  created() {
-    this.setPlaceholder()
+  @Watch("clearFunction")
+  clearInput() {
+    this.model = ""
   }
 }
 </script>
@@ -76,66 +36,34 @@ export default {
 <style lang="scss">
 
   .input-wrapper {
-    width: 200px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     box-sizing: border-box;
-    margin-bottom: 16px;
+    margin-top: 8px;
     position: relative;
   }
 
   .input-label {
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7782;
   }
 
   .input {
     outline: none;
+    border: none;
+    border-bottom: 2px solid #6b7782;
     width: 100%;
-    font-size: 13px;
-    margin-top: 4px;
-    padding: 5px 10px;
-    border-radius: 4px;
+    font-size: 16px;
+    padding: 3px 0;
     box-sizing: border-box;
-    border: 2px solid #e6e6e6;
-    background: #fefefe;
+    background: transparent;
+    color: white;
   }
 
   .input:focus {
-    border: 2px solid #48d294;
-  }
-
-  .error {
-    text-align: right;
-    width: 200px;
-    position: absolute;
-    font-size: 13px;
-    font-weight: 700;
-    color: crimson;
-  }
-
-  .messageInputWrapper {
-    display: flex;
-    align-items: center;
-    width: 80%;
-    margin: 0;
-  }
-
-  .messageInput {
-    width: 90%;
-    margin: 0;
-    font-size: 16px;
-  }
-
-  .messageInput:focus {
-    border: 2px solid #bababa;
-  }
-
-  .send-icon {
-    position: absolute;
-    top: 5px;
-    left: 99%;
-    cursor: pointer;
+    border-bottom: 2px solid #6faff4;
   }
 </style>
